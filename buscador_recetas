@@ -1,0 +1,113 @@
+package com.agustinbergomi.nolotirescomidasustentable;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.io.IOException;
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity {
+
+    private Button getBtn;
+    private TextView result;
+    private EditText ingresar_ingred;
+    private String texto_ingresado;
+    private String parrafo_texto;
+    private String farrapo_texto;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        result = (TextView) findViewById(R.id.result);
+        ingresar_ingred = (EditText) findViewById(R.id.et_ingrediente);
+        getBtn = (Button) findViewById(R.id.getBtn);
+        getBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getWebsite();
+            }
+        });
+
+
+    }
+
+
+//hacer que si hay un punto deje un renglon
+
+
+    private void getWebsite() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final StringBuilder builder = new StringBuilder();
+                final StringBuilder builder2 = new StringBuilder();
+                final StringBuilder builder3 = new StringBuilder();
+
+
+                try {
+                    Document doc = Jsoup.connect("https://saposapo43.000webhostapp.com/recetas_app.html").get();
+                    String title = doc.title();
+                    Elements uls = doc.select("ul.ingredientes_listado");
+                    Elements ingredientes = doc.select("ul.ingredientes_listado>li");
+                    Elements preparacion = doc.select(("ul.ingredientes_listado>p"));
+
+                    texto_ingresado = ingresar_ingred
+                            .getText()
+                            .toString();
+
+                    for (Element item : ingredientes) {
+                        String item_texto = item.text();
+
+                        //si el texto ingresado se encuentra en el parrafo arrojar true
+                        boolean isFound = item_texto.indexOf(texto_ingresado) != 1 ? true : false;
+                        //si es true tomar el texto del parrafo y agregarlo al builder.
+                        if (isFound == true) {
+                                builder.append(item_texto+"\n");
+                            }
+                        }
+
+                        /*
+                        } else {
+                            builder.append("");
+                        }
+                        */
+
+
+                    if (builder == null){
+                        builder.append("No se encontraron resultados para ese ingrediente");
+                    }
+
+
+                } catch (IOException e) {
+                    builder.append("Error : ").append(e.getMessage()).append("\n");
+                }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        result.setText(builder.toString());
+
+                    }
+                });
+            }
+        }).start();
+    }
+}
+
+//TODO: AGREGAR MENSAJE No se encontraron resultados para ese ingrediente. Intente con otro ingrediente. SI NO SE ECONTRARON
+//TODO: PONER TITULO, INGREDIENTES, PROCEDIMIENTO TODO EN EL MISMO UL CLASS
+//TODO: ORDENAR TEXTO EN PAGINA WEB
+//TODO: SOBREESCRIBIR TOSTRING PARA ESTRUCTURAR TEXTO
+//TODO: SI HAY UN PUNTO DEJAR UN RENGLON SI HAY UN RENGLON DEJAR OTRO RENGLON
