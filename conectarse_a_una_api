@@ -1,0 +1,35 @@
+Hacer el request;:
+
+RquestQueue  requestqueue = Volley.newRquestQueue(this);
+
+/*
+Params:
+method
+
+*/
+
+String URL="http://localhost:8081/RestWS/fetch/customer";
+
+//instancio clase JsonObjectRequest
+//paso los respectivos parametros
+JsonObjectRequest objectRequest  = new JsonObjectrequest(
+	Request.Method.GET
+	URL;
+	null; //parametro que se envia
+	//listener (interface) => implementar sus metodos
+	new Response.Listener<JSONObject>(){
+		@Override
+		public void onResponse(JSONObject response) {
+					
+		}
+	}
+	//en caso de error:
+	new Response.ErrorListener() {
+		@Override
+		public void OnErrorResponse(volleyerror error) {
+		}
+	}
+
+//la lista de solicitudes requiere un objeto request como parametro:
+requestQueue.add(objectRequest);
+);
