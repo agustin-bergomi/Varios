@@ -1,3 +1,7 @@
+
+Este archivo esta sin terminar, ver archivo terminado en el siguiente link:
+https://github.com/agustin-bergomi/Conexion_con_API
+
 Hacer el request;:
 
 RquestQueue  requestqueue = Volley.newRquestQueue(this);
