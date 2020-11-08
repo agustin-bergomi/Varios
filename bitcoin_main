@@ -1,0 +1,99 @@
+package com.example.dolarhoy;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ListAdapter;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity {
+
+    private Button getBtn;
+    private TextView result;
+    private TextView siglas;
+    public int a;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        result = (TextView) findViewById(R.id.result);
+        siglas = (TextView) findViewById(R.id.result2);
+
+        getBtn = (Button) findViewById(R.id.getBtn);
+        getBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getWebsite();
+            }
+        });
+    }
+
+    private void getWebsite() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final StringBuilder builder = new StringBuilder();
+                final StringBuilder builder2 = new StringBuilder();
+                final StringBuilder builder3 = new StringBuilder();
+
+
+                try {
+                    Document doc = Jsoup.connect("https://finance.yahoo.com/cryptocurrencies/").get();
+                    String title = doc.title();
+                    Elements parrafos = doc.select("td");
+
+                    ArrayList<String> titulos = new ArrayList<>();
+
+                    titulos.add("Sigla");
+                    titulos.add("Moneda");
+                    titulos.add("Precio USD");
+                    titulos.add("Variacion");
+                    titulos.add("Variacion %");
+                    titulos.add("Capitalizacion");
+                    titulos.add("Volumen");
+                    titulos.add("Volumen 24hs");
+                    titulos.add("Total Volumen");
+                    titulos.add("Oferta");
+                    titulos.add("    ");
+                    titulos.add("     ");
+
+
+
+
+                        for (Element parrafo : parrafos) {
+                            builder.append(parrafo.text() + "\n\n" + "");
+
+                    }
+                        int a=parrafos.size();
+                        while (a >=1) {
+                            for (String titulo : titulos) {
+                                builder2.append(titulo + "\n\n" + "");
+                                a--;
+                            }
+                        }
+
+                } catch (IOException e) {
+                    builder.append("Error : ").append(e.getMessage()).append("\n");
+                }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        siglas.setText(builder2.toString());
+
+                        result.setText(builder.toString());
+                    }
+                });
+            }
+        }).start();
+    }
+}
