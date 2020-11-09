@@ -1,0 +1,83 @@
+package com.yellowgreenbearapps.noticias_futbol_peru;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import java.io.IOException;
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity {
+
+    //declaracion de las variables
+    private Button getBtn;
+    private TextView result;
+    private TextView siglas;
+    public int a;
+
+    //onCreate: metodo que viene con el entorno android. Permite lanzar la aplicacion.
+    //Bundle: clase vinculada al sistema operativo y a los archivos que componen la aplicacion.
+    //savedInstanceState: almacena la informacion del bundle hasta una nueva ejecuacion.
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        getWebsite();
+        //en un textview voy a mostrar los resultados
+        //en otro textview voy a poner los titulos que explique que resultado es cada fila
+        result = (TextView) findViewById(R.id.result);
+        siglas = (TextView) findViewById(R.id.result2);
+
+        //el boton permite descargar y mostrar la info.
+        //al boton se le agrega un listener porque asi detecta si se clickea.
+        getBtn = (Button) findViewById(R.id.getBtn);
+        getBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getWebsite();
+            }
+        });
+    }
+
+    private void getWebsite() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final StringBuilder builder = new StringBuilder();
+                final StringBuilder builder2 = new StringBuilder();
+
+                try {
+                    Document doc = Jsoup.connect("https://paginidipruibi.000webhostapp.com/resumen.html").get();
+                    //Document doc = Jsoup.connect("http://saposapo43.000webhostapp.com/").get();
+                    String title = doc.title();
+                    Elements parrafos = doc.select("p");
+                    ArrayList<String> titulos = new ArrayList<>();
+                    titulos.add("Resumenes de Administracion General");
+                    for (Element parrafo : parrafos) {
+                        String parrafo_texto = parrafo.text();
+                        builder.append(parrafo_texto + "\n\n" + "");
+                        }
+                    for (String titulo : titulos) {
+                        builder2.append(titulo + "\n\n" + "");
+                        }
+                } catch (IOException e) {
+                    builder.append("Error : ").append(e.getMessage()).append("\n");
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        siglas.setText(builder2.toString());
+                        result.setText(builder.toString());
+
+                    }
+                });
+            }
+        }).start();
+    }
+}
